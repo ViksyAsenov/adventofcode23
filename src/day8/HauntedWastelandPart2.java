@@ -31,13 +31,13 @@ public class HauntedWastelandPart2 {
         public static List<NetworkNode> heads = new ArrayList<>();
         public static List<NetworkNode> allNetworkNodes = new ArrayList<>();
 
-        public NetworkNode(String point) {
+        private NetworkNode(String point) {
             this.point = point;
             this.leftNode = null;
             this.rightNode = null;
         }
 
-        public NetworkNode(String point, String leftPoint, String rightPoint) {
+        private NetworkNode(String point, String leftPoint, String rightPoint) {
             NetworkNode currentNode = getOrCreateNode(point);
             addNodeToNetworkIfAbsent(currentNode);
 

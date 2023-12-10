@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class MirageMaintenancePart1 {
+public class MirageMaintenancePart2 {
     public static List<String> getInput() {
         List<String> lines = new ArrayList<>();
 
@@ -24,21 +24,34 @@ public class MirageMaintenancePart1 {
         return lines;
     }
 
-    public static long getNextNumber(List<Long> numbers, boolean isFirst) {
-        if (numbers.stream().limit(numbers.size() - 1).allMatch(n -> n == 0)) {
-            return numbers.getLast();
+    public static long getNextNumber(List<Long> numbers) {
+        List<List<Long>> previousNumbers = new ArrayList<>(List.of(new ArrayList<>(numbers)));
+
+        while (!allZeros(previousNumbers.getLast())) {
+            List<Long> currentNumbers = getDifferences(previousNumbers.getLast());
+            previousNumbers.add(currentNumbers);
+        }
+        
+        for (int i = previousNumbers.size() - 1; i > 0; i--) {
+            long currentNewNumber = previousNumbers.get(i - 1).getFirst() - previousNumbers.get(i).getFirst();
+            previousNumbers.get(i - 1).addFirst(currentNewNumber);
         }
 
-        List<Long> updatedNumbers = new ArrayList<>();
-        for (int i = 0; i < numbers.size() - 1; i++) {
-            if(i < numbers.size() - 2 || isFirst) {
-                updatedNumbers.add(numbers.get(i + 1) - numbers.get(i));
-            }
+        return previousNumbers.getFirst().getFirst();
+    }
+
+    public static boolean allZeros(List<Long> numbers) {
+        return numbers.stream().allMatch(n -> n == 0);
+    }
+
+    public static List<Long> getDifferences(List<Long> numbers) {
+        List<Long> differences = new ArrayList<>();
+
+        for(int i = 0; i < numbers.size() - 1; i++) {
+            differences.add(numbers.get(i + 1) - numbers.get(i));
         }
 
-        updatedNumbers.add(numbers.getLast() + updatedNumbers.getLast());
-
-        return getNextNumber(updatedNumbers, false);
+        return differences;
     }
 
     public static long getOutput(List<String> lines) {
@@ -46,7 +59,7 @@ public class MirageMaintenancePart1 {
 
         for(String line : lines) {
             List<Long> numbers = Arrays.stream(line.split(" ")).map(Long::parseLong).toList();
-            long nextNumber = getNextNumber(numbers, true);
+            long nextNumber = getNextNumber(numbers);
             sum += nextNumber;
         }
 
