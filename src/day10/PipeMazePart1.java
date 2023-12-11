@@ -26,14 +26,16 @@ public class PipeMazePart1 {
 
     public static class Pipe {
         public char value;
+        public int depth;
+        public List<Pipe> adjacentPipes = new ArrayList<>();
         private final int row;
         private final int col;
 
-        public List<Pipe> adjacentPipes = new ArrayList<>();
         public static Pipe startPipe = null;
 
         public Pipe(char value, int row, int col) {
             this.value = value;
+            this.depth = 0;
             this.row = row;
             this.col = col;
 
@@ -93,13 +95,11 @@ public class PipeMazePart1 {
         }
     }
 
-
     public static int getOutput(List<String> lines) {
         int height = lines.size();
         int width = lines.get(0).length();
 
         Pipe[][] pipeGraph = new Pipe[height][width];
-        //List<Pipe> allPipes = new ArrayList<>();
 
         for(int row = 0; row < lines.size(); row++) {
             for(int col = 0; col < lines.get(row).length(); col++) {
@@ -107,7 +107,6 @@ public class PipeMazePart1 {
                 
                 Pipe pipe = new Pipe(currentValue, row, col);
                 pipeGraph[row][col] = pipe;
-                //allPipes.add(pipe);
             }
         }
 
@@ -124,33 +123,35 @@ public class PipeMazePart1 {
             }
         }
 
-        //TODO: MAKE IT WORK
-        return getLongestDistanceFromStart();
+        return getBiggestDepthFromStart();
     }
 
-    public static int getLongestDistanceFromStart() {
+    public static int getBiggestDepthFromStart() {
         Queue<Pipe> queueOfPipes = new LinkedList<>();
         Set<Pipe> visitedPipes = new HashSet<>();
 
         Pipe startPipe = Pipe.startPipe;
-
         queueOfPipes.offer(startPipe);
         visitedPipes.add(startPipe);
 
-
+        int maxDepth = startPipe.depth;
         while (!queueOfPipes.isEmpty()) {
             Pipe pipe = queueOfPipes.poll();
-            List<Pipe> adjacentPipes = pipe.adjacentPipes;
+            int currentDepth = pipe.depth;
+            maxDepth = Math.max(maxDepth, currentDepth);
 
+            List<Pipe> adjacentPipes = pipe.adjacentPipes;
             for(Pipe currentPipe : adjacentPipes) {
                 if(!visitedPipes.contains(currentPipe)) {
+                    currentPipe.depth = currentDepth + 1;
+
                     queueOfPipes.offer(currentPipe);
                     visitedPipes.add(currentPipe);
                 }
             }
         }
 
-        return 0;
+        return maxDepth;
     }
 
     public static void main(String[] args) {
